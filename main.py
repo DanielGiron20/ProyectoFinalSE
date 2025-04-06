@@ -330,7 +330,7 @@ def main(page: ft.Page):
         )
     ], spacing=15, width=400)
 
-    panel_derecho = ft.Column([
+    panel_derecho = ft.Container( content= ft.Column([
         ft.Text("🩺 Diagnóstico", weight="bold"),
         ft.Container(
             diagnostico_actual,
@@ -354,7 +354,9 @@ def main(page: ft.Page):
             border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=10
         )
+       
     ], spacing=15, width=300)
+    )
 
     # Configuración final
     boton_voz = panel_izquierdo.controls[2].controls[0]
