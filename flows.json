@@ -1,0 +1,363 @@
+[
+    {
+        "id": "79710c11178e9d97",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "730b7c5629152a9e",
+        "type": "telegram receiver",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "bot": "f1a4955ce14f4e70",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "379c0e0cf567929f",
+                "ddbe41b85340adbe"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "379c0e0cf567929f",
+        "type": "function",
+        "z": "79710c11178e9d97",
+        "name": "function 1",
+        "func": "msg.payload = {\n    pregunta: msg.payload.content,\n    chatId: 5200364922\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 100,
+        "wires": [
+            [
+                "668b249e4df57534",
+                "1c58332c71bb1242"
+            ]
+        ]
+    },
+    {
+        "id": "ddbe41b85340adbe",
+        "type": "debug",
+        "z": "79710c11178e9d97",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "668b249e4df57534",
+        "type": "debug",
+        "z": "79710c11178e9d97",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "f7e3879c58dc310a",
+        "type": "debug",
+        "z": "79710c11178e9d97",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "22cea43b71dd246d",
+        "type": "http in",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "url": "/respuesta",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 640,
+        "wires": [
+            [
+                "abd196db4a40b52b",
+                "57067036997644a2"
+            ]
+        ]
+    },
+    {
+        "id": "abd196db4a40b52b",
+        "type": "function",
+        "z": "79710c11178e9d97",
+        "name": "function 9",
+        "func": "msg.payload = {\n    chatId: msg.payload.chatId,  // ID del chat recibido desde Flask\n    type: \"message\",\n    content: msg.payload.respuesta  // Diagnóstico generado\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 640,
+        "wires": [
+            [
+                "94994a41e8770d99",
+                "1d03584bb0a8ba04"
+            ]
+        ]
+    },
+    {
+        "id": "57067036997644a2",
+        "type": "debug",
+        "z": "79710c11178e9d97",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 240,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "94994a41e8770d99",
+        "type": "debug",
+        "z": "79710c11178e9d97",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "75208ce78f13c271",
+        "type": "debug",
+        "z": "79710c11178e9d97",
+        "name": "debug 11",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "5f7d2619269284a9",
+        "type": "http in",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "url": "/pregunta",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 300,
+        "y": 380,
+        "wires": [
+            [
+                "bfc6c557ae1994c2"
+            ]
+        ]
+    },
+    {
+        "id": "7b986c913bab2056",
+        "type": "http request",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAXfXO0RFMAZfuhWn0ukVb6gO2FUovK4Jg",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Content-Type",
+                "keyValue": "",
+                "valueType": "application/json",
+                "valueValue": ""
+            }
+        ],
+        "x": 550,
+        "y": 380,
+        "wires": [
+            [
+                "02caa64e8455c498"
+            ]
+        ]
+    },
+    {
+        "id": "bfc6c557ae1994c2",
+        "type": "function",
+        "z": "79710c11178e9d97",
+        "name": "function 10",
+        "func": "msg.payload = {\n    contents: [{\n        parts: [{\n            text: `Eres un médico experto en hipertension. Analiza estos síntomas: \"${msg.payload.pregunta}\". \n                  Devuelve SOLO un JSON válido (sin comentarios) con esta estructura:\n                  {\n                    \"diagnostico\": \"texto\",\n                    \"opciones\": [\n                      {\n                        \"valor\": \"id-unico\",\n                        \"texto\": \"opción 1\",\n                        \"explicacion\": \"detalles...\"\n                      }\n                    ],\n                    \"explicacion\": \"análisis completo\"\n                  }`\n        }]\n    }]\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 500,
+        "wires": [
+            [
+                "7b986c913bab2056"
+            ]
+        ]
+    },
+    {
+        "id": "02caa64e8455c498",
+        "type": "function",
+        "z": "79710c11178e9d97",
+        "name": "function 11",
+        "func": "try {\n    const respuestaGemini = msg.payload.candidates[0].content.parts[0].text;\n    \n    // Extraer JSON de la respuesta (aunque Gemini lo devuelva como string)\n    const inicioJson = respuestaGemini.indexOf('{');\n    const finJson = respuestaGemini.lastIndexOf('}') + 1;\n    const jsonStr = respuestaGemini.slice(inicioJson, finJson);\n    \n    const datos = JSON.parse(jsonStr);\n    \n    // Validar estructura\n    if (!datos.diagnostico || !Array.isArray(datos.opciones)) {\n        throw new Error(\"Estructura de respuesta inválida\");\n    }\n    \n    msg.payload = {\n        diagnostico: datos.diagnostico,\n        opciones: datos.opciones.map(op => ({\n            valor: op.valor || \"op\"+Math.random().toString(36).substring(2,7),\n            texto: op.texto || \"Opción sin texto\",\n            explicacion: op.explicacion || \"Sin explicación\"\n        })),\n        explicacion: datos.explicacion || \"Análisis no disponible\"\n    };\n    \n} catch (error) {\n    msg.payload = {\n        error: \"Error al procesar: ${error.message}\",\n        respuesta_cruda: msg.payload\n    };\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 500,
+        "wires": [
+            [
+                "5f03e0c985209b2b"
+            ]
+        ]
+    },
+    {
+        "id": "1d03584bb0a8ba04",
+        "type": "telegram sender",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "bot": "f1a4955ce14f4e70",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 650,
+        "y": 640,
+        "wires": [
+            [
+                "75208ce78f13c271"
+            ]
+        ]
+    },
+    {
+        "id": "1c58332c71bb1242",
+        "type": "http request",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://127.0.0.1:5000/mensaje",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Content-Type",
+                "keyValue": "",
+                "valueType": "application/json",
+                "valueValue": ""
+            }
+        ],
+        "x": 530,
+        "y": 180,
+        "wires": [
+            [
+                "f7e3879c58dc310a"
+            ]
+        ]
+    },
+    {
+        "id": "5f03e0c985209b2b",
+        "type": "http response",
+        "z": "79710c11178e9d97",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 790,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "f1a4955ce14f4e70",
+        "type": "telegram bot",
+        "botname": "SE1PAC2025_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": 300,
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": 6667,
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": 8443,
+        "publicbotport": 8443,
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    }
+]

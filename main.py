@@ -2,12 +2,17 @@ import flet as ft
 import requests
 from datetime import datetime
 import speech_recognition as sr
+from flask import Flask, request
+import threading
 import os
 
-def main(page: ft.Page):
+def main(page_: ft.Page):
+    global page, campo_sintomas
+    page=page_
     # Configuración inicial
     page.title = "Sistema Experto Médico - Hipertensión"
     page.theme_mode = ft.ThemeMode.LIGHT
+    page.scroll = ft.ScrollMode.AUTO
     page.padding = 30
     page.window_width = 1300
     page.window_height = 850
@@ -244,10 +249,10 @@ def main(page: ft.Page):
 
     def procesar_respuesta(datos):
         if "error" in datos:
-            mostrar_mensaje(f"❌ {datos['error']}", ft.colors.RED)
+            mostrar_mensaje(f"❌ {datos['error']}", ft.Colors.RED)
             return
 
-        diagnostico_actual.value = datos.get("diagnostico", "Hipertensión no clasificada")
+        diagnostico_actual.value = datos.get("diagnostico", "Diagnóstico no disponible")
         explicacion_actual.value = datos.get("explicacion", "")
 
         grupo_radios.content.controls = [
@@ -270,8 +275,27 @@ def main(page: ft.Page):
                 )
             )
         )
-        mostrar_mensaje("✅ Diagnóstico generado", ft.colors.GREEN)
+
+        mostrar_mensaje("✅ Diagnóstico generado", ft.Colors.GREEN)
         page.update()
+
+        # Enviar el diagnóstico de regreso a Node-RED
+        chat_id = "5200364922"  # Chat ID fijo
+        respuesta = datos.get("diagnostico", "Diagnóstico no disponible")
+
+        try:
+            response = requests.post(
+                "http://127.0.0.1:1880/respuesta",
+                json={"chatId": chat_id, "respuesta": respuesta},
+                timeout=10
+            )
+            if response.status_code == 200:
+                mostrar_mensaje("✅ Diagnóstico enviado a Telegram", ft.Colors.GREEN)
+            else:
+                mostrar_mensaje(f"❌ Error enviando a Telegram: {response.status_code}", ft.Colors.RED)
+        except Exception as e:
+            mostrar_mensaje(f"❌ Error enviando a Telegram: {str(e)}", ft.Colors.RED)
+
 
     def mostrar_detalle_opcion(e):
         if grupo_radios.value:
@@ -374,6 +398,102 @@ def main(page: ft.Page):
             ], expand=True, spacing=20)
         ], spacing=20)
     )
+
+    # Crear la aplicación Flask después de inicializar Flet
+    app = Flask(__name__)
+
+    # Endpoint para recibir mensajes de Node-RED
+    @app.route('/mensaje', methods=['POST'])
+    def recibir_mensaje():
+        global page, campo_sintomas
+        if page is None:
+            return {"status": "error", "message": "La página no está inicializada."}, 500
+
+        data = request.get_json()
+        pregunta = data.get("pregunta", "")
+        chat_id = data.get("chatId", "")
+
+        if not chat_id:
+            return {"status": "error", "message": "chatId no proporcionado."}, 400
+
+        # Mostrar el mensaje recibido en la app de Flet
+        page.add(ft.Text(f"Telegram: {pregunta}", color=ft.colors.BLUE))
+        page.update()
+
+        # Colocar el texto recibido en el campo de síntomas
+        campo_sintomas.value = pregunta
+        page.update()
+
+        # Simular el clic en el botón de consultar diagnóstico
+        def hacer_consulta():
+            sintomas = campo_sintomas.value.strip()
+            if not sintomas:
+                mostrar_mensaje("⚠️ Por favor describe tus síntomas", ft.colors.RED)
+                return {"status": "error", "message": "Síntomas no proporcionados."}, 400
+
+            limpiar_interfaz()
+            mostrar_mensaje("🔍 Analizando síntomas...", ft.colors.BLUE)
+
+            try:
+                response = requests.post(
+                    "http://127.0.0.1:1880/pregunta",
+                    json={"pregunta": sintomas},
+                    timeout=15
+                )
+
+                if response.status_code == 200:
+                    datos = response.json()
+                    procesar_respuesta(datos)
+
+                    diagnostico = datos.get("diagnostico", "Diagnóstico no disponible")
+
+                    # Enviar el diagnóstico de regreso a Telegram
+                    respuesta = {"respuesta": diagnostico, "chatId": chat_id}
+                    requests.post("http://127.0.0.1:1880/respuesta", json=respuesta)
+
+                    return {
+                        "status": "ok",
+                        "chatId": chat_id,
+                        "respuesta": diagnostico
+                    }, 200
+                else:
+                    mostrar_mensaje(f"❌ Error del servidor: {response.status_code}", ft.colors.RED)
+                    return {
+                        "status": "error",
+                        "message": f"Error del servidor: {response.status_code}"
+                    }, 500
+
+            except Exception as ex:
+                mostrar_mensaje(f"❌ Error de conexión: {str(ex)}", ft.colors.RED)
+                return {
+                    "status": "error",
+                    "message": f"Error de conexión: {str(ex)}"
+                }, 500
+
+        # Ejecutar la consulta y retornar directamente el resultado
+        return hacer_consulta()
+
+    # Endpoint para manejar respuestas enviadas desde Node-RED
+    @app.route('/respuesta', methods=['POST'])
+    def enviar_respuesta():
+        data = request.json
+        chat_id = data.get("chatId")
+        respuesta = data.get("respuesta")
+
+        if not chat_id or not respuesta:
+            return {"status": "error", "message": "Faltan chatId o respuesta"}, 400
+
+        print(f"Enviando respuesta a Telegram: {respuesta} (chatId: {chat_id})")
+        return {
+            "status": "ok",
+            "chatId": chat_id,
+            "respuesta": respuesta,
+            "timestamp": datetime.now().isoformat()
+        }, 200
+
+    # Iniciar el servidor Flask en un hilo separado
+    threading.Thread(target=lambda: app.run(port=5000), daemon=True).start()
+
 
 if __name__ == "__main__":
     ft.app(target=main)
